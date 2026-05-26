@@ -6,7 +6,9 @@ Google Calendars. This derivative of
 supports macOS, Linux, and Windows while adding guardrails for mailbox actions
 and content returned to an AI client.
 
-For a browser-friendly public setup and security summary, see
+Read the browser-formatted public setup and security summary through
+[GitHub Pages](https://bpmorris22.github.io/gmail-mcp-hardened-cross-platform/),
+or view its source at
 [`docs/gmail-mcp-hardened-report.html`](docs/gmail-mcp-hardened-report.html).
 
 ## Features

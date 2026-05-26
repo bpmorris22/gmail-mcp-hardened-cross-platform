@@ -23,4 +23,5 @@ Thumbs.db
 # Generated reports and archives
 *.html
 !docs/gmail-mcp-hardened-report.html
+!docs/index.html
 *.zip
