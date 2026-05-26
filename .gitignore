@@ -1,0 +1,25 @@
+# Local configuration and OAuth material
+config.json
+credentials/
+
+# Python and local tools
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Editor and OS metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local comparison inputs; do not publish machine-specific copies or archives.
+/Mac/
+/Windows/
+
+# Generated reports and archives
+*.html
+*.zip

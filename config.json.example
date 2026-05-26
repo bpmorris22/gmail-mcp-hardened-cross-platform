@@ -1,0 +1,15 @@
+{
+  "accounts": {
+    "personal": {
+      "email": "your.personal@gmail.com",
+      "description": "Personal Gmail account",
+      "client_secret": "./credentials/personal_client_secret.json"
+    },
+    "work": {
+      "email": "your.work@company.com",
+      "description": "Work account",
+      "client_secret": "./credentials/work_client_secret.json"
+    }
+  },
+  "credentials_dir": "./credentials"
+}
