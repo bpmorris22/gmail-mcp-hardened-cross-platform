@@ -6,6 +6,9 @@ Google Calendars. This derivative of
 supports macOS, Linux, and Windows while adding guardrails for mailbox actions
 and content returned to an AI client.
 
+For a browser-friendly public setup and security summary, see
+[`docs/gmail-mcp-hardened-report.html`](docs/gmail-mcp-hardened-report.html).
+
 ## Features
 
 - Multi-account Gmail search, reading, drafts, labels, and trash handling.

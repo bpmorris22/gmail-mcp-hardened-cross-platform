@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-Platform Hardened Gmail and Calendar MCP - Project Guide</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #f5f7fb;
+    --ink: #17233a;
+    --muted: #57657b;
+    --accent: #1b5a91;
+    --accent-soft: #e8f1fa;
+    --line: #d6dfeb;
+    --good: #17633a;
+    --good-bg: #e9f6ed;
+    --warn: #885b00;
+    --warn-bg: #fff5de;
+    --code: #f1f4f8;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.58 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.8rem 1.5rem 4.5rem;
+  }
+  header {
+    padding: 0 0 1.6rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  h1 {
+    font-size: clamp(2rem, 4.5vw, 2.55rem);
+    line-height: 1.13;
+    margin: 0 0 0.65rem;
+    letter-spacing: -0.035em;
+  }
+  .subtitle {
+    color: var(--muted);
+    max-width: 760px;
+    margin: 0 0 1.1rem;
+    font-size: 1.06rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    padding: 0.2rem 0.7rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  main { margin-top: 1.6rem; }
+  h2 {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.35rem;
+    margin: 2.5rem 0 1rem;
+    font-size: 1.48rem;
+    letter-spacing: -0.018em;
+  }
+  h3 {
+    color: var(--accent);
+    font-size: 1.12rem;
+    margin: 1.55rem 0 0.55rem;
+  }
+  p, ul, ol { margin: 0.65rem 0; }
+  li { margin: 0.22rem 0; }
+  a { color: var(--accent); }
+  code {
+    font-family: "Cascadia Code", Consolas, "SFMono-Regular", monospace;
+    font-size: 0.89em;
+    background: var(--code);
+    border-radius: 4px;
+    padding: 0.08rem 0.33rem;
+  }
+  pre {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 5px;
+    background: var(--code);
+    padding: 0.9rem 1rem;
+    line-height: 1.48;
+    font-size: 0.86rem;
+  }
+  pre code {
+    padding: 0;
+    background: transparent;
+    font-size: inherit;
+  }
+  .toc {
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.6rem 0;
+  }
+  .toc strong {
+    display: block;
+    color: var(--accent);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+  }
+  .toc ol {
+    columns: 2;
+    padding-left: 1.2rem;
+    margin: 0;
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .toc a:hover { text-decoration: underline; }
+  .callout {
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    border-left: 4px solid var(--accent);
+    background: var(--panel);
+    margin: 1rem 0;
+  }
+  .callout.good {
+    border-color: var(--good);
+    background: var(--good-bg);
+  }
+  .callout.warn {
+    border-color: var(--warn);
+    background: var(--warn-bg);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.9rem 0;
+    font-size: 0.93rem;
+  }
+  th, td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.52rem 0.65rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .tag {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 0.05rem 0.43rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.73rem;
+    font-weight: 700;
+  }
+  .tag.read { color: var(--good); background: var(--good-bg); }
+  .tag.write { color: var(--warn); background: var(--warn-bg); }
+  footer {
+    color: var(--muted);
+    font-size: 0.86rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.1rem;
+    margin-top: 3.25rem;
+  }
+  @media (max-width: 620px) {
+    .toc ol { columns: 1; }
+    .page { padding-top: 1.6rem; }
+  }
+  @media print {
+    .page { max-width: none; padding: 0; }
+    a { color: var(--ink); text-decoration: none; }
+    pre, table, .callout { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>Cross-Platform Hardened Gmail and Calendar MCP</h1>
+  <p class="subtitle">A public-facing setup, operations, and security guide for
+    a local MCP server supporting Gmail and read-only Google Calendar on
+    macOS, Linux, and Windows.</p>
+  <div class="meta">
+    <span class="pill">Document date: 26 May 2026</span>
+    <span class="pill">Platforms: macOS / Linux / Windows</span>
+    <span class="pill">Upstream base: <code>DiegoMaldonadoRosas/gmail-mcp</code> at <code>9ae20b6</code></span>
+  </div>
+</header>
+
+<main>
+  <div class="callout good">
+    <strong>Publication summary.</strong> This guide describes the consolidated
+    project version. Google Drive uploads and file sharing are deliberately
+    excluded from this MCP. Gmail email sending is retained, protected by a
+    preview and one-time confirmation-token flow.
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#tools">Tool surface</a></li>
+      <li><a href="#install">Cross-platform install</a></li>
+      <li><a href="#oauth">Google OAuth setup</a></li>
+      <li><a href="#client">MCP client configuration</a></li>
+      <li><a href="#security">Security model</a></li>
+      <li><a href="#merge">Merge decisions</a></li>
+      <li><a href="#verification">Verification and publication</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="overview">1. Overview</h2>
+  <p>This server is a local Model Context Protocol (MCP) process that an MCP
+    client launches over standard input and output. It provides multiple-account
+    Gmail operations and read-only Google Calendar access using OAuth credentials
+    held on the user's own computer.</p>
+  <p>The project is derived from
+    <a href="https://github.com/DiegoMaldonadoRosas/gmail-mcp">DiegoMaldonadoRosas/gmail-mcp</a>
+    and consolidates locally tested macOS and Windows variants into one portable
+    distribution. Platform-specific setup scripts are included, while the
+    Python server behavior is shared.</p>
+
+  <h3>Key decisions</h3>
+  <ul>
+    <li>Keep the Mac variant's functional <code>gmail_send</code> path, with stronger confirmation controls.</li>
+    <li>Support both shell-based installation on macOS/Linux and PowerShell installation on Windows.</li>
+    <li>Keep Gmail attachment sending and received-attachment download within restricted local folders.</li>
+    <li>Exclude cloud-file upload, Drive link generation, and sharing permissions from the MCP.</li>
+  </ul>
+
+  <h2 id="tools">2. Tool Surface</h2>
+  <table>
+    <thead>
+      <tr><th>Area</th><th>Tools</th><th>Mode</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Account</td>
+        <td><code>list_accounts</code></td>
+        <td><span class="tag read">Read</span></td>
+      </tr>
+      <tr>
+        <td>Gmail reading</td>
+        <td><code>gmail_get_profile</code>, <code>gmail_search</code>, <code>gmail_read_message</code>, <code>gmail_read_thread</code>, <code>gmail_list_drafts</code>, <code>gmail_list_labels</code></td>
+        <td><span class="tag read">Read</span></td>
+      </tr>
+      <tr>
+        <td>Gmail actions</td>
+        <td><code>gmail_send</code>, <code>gmail_create_draft</code>, <code>gmail_modify_labels</code>, <code>gmail_trash</code></td>
+        <td><span class="tag write">Confirm</span></td>
+      </tr>
+      <tr>
+        <td>Attachments</td>
+        <td><code>gmail_download_attachment</code></td>
+        <td><span class="tag write">Confirm</span></td>
+      </tr>
+      <tr>
+        <td>Calendar</td>
+        <td><code>calendar_list_calendars</code>, <code>calendar_list_events</code>, <code>calendar_search</code>, <code>calendar_get_event</code></td>
+        <td><span class="tag read">Read</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Email sending is present.</strong> The consolidated server exposes
+    <code>gmail_send</code> and delegates delivery to
+    <code>GmailService.send_message</code>. It does not send on the initial
+    request: the server returns a preview and requires a current confirmation
+    token before execution.
+  </div>
+
+  <h2 id="install">3. Cross-Platform Install</h2>
+  <h3>Requirements</h3>
+  <ul>
+    <li>Python 3.10 or later.</li>
+    <li>Claude Desktop or another stdio-capable MCP client.</li>
+    <li>A Google Cloud OAuth Desktop client with the Gmail API and Google Calendar API enabled.</li>
+  </ul>
+
+  <h3>macOS or Linux</h3>
+  <pre><code>git clone https://github.com/OWNER/REPOSITORY.git
+cd REPOSITORY
+bash setup.sh</code></pre>
+
+  <h3>Windows PowerShell</h3>
+  <pre><code>git clone https://github.com/OWNER/REPOSITORY.git
+Set-Location REPOSITORY
+powershell -ExecutionPolicy Bypass -File .\setup.ps1</code></pre>
+
+  <p>The setup script creates a virtual environment, installs dependencies,
+    creates the local credential folders and a template-derived
+    <code>config.json</code> if needed, and prints an MCP client configuration
+    using absolute paths.</p>
+
+  <h2 id="oauth">4. Google OAuth Setup</h2>
+  <h3>Enable APIs and create credentials</h3>
+  <ol>
+    <li>Create or select a Google Cloud project. A separate project per mailbox is recommended.</li>
+    <li>Enable the <strong>Gmail API</strong> and <strong>Google Calendar API</strong>.</li>
+    <li>Configure the OAuth consent screen for the intended users.</li>
+    <li>Create an OAuth Client ID with application type <strong>Desktop app</strong> and download its JSON file.</li>
+    <li>Place each downloaded JSON file in the local <code>credentials/</code> directory, which is excluded from Git.</li>
+  </ol>
+
+  <h3>Configure accounts</h3>
+  <p>Use placeholder account keys and local secret locations in
+    <code>config.json</code>. Never commit this file or OAuth client-secret JSON.</p>
+  <pre><code>{
+  "accounts": {
+    "personal": {
+      "email": "your.personal@example.com",
+      "description": "Personal Gmail",
+      "client_secret": "./credentials/personal_client_secret.json"
+    },
+    "work": {
+      "email": "your.work@example.com",
+      "description": "Work Gmail",
+      "client_secret": "./credentials/work_client_secret.json"
+    }
+  },
+  "credentials_dir": "./credentials"
+}</code></pre>
+
+  <h3>Authenticate</h3>
+  <p>Run once for each configured account, following the browser consent flow.</p>
+  <pre><code># macOS or Linux
+.venv/bin/python setup_auth.py
+
+# Windows PowerShell
+.\.venv\Scripts\python.exe setup_auth.py</code></pre>
+
+  <p>The server requests these scopes only:</p>
+  <pre><code>https://www.googleapis.com/auth/gmail.modify
+https://www.googleapis.com/auth/calendar.calendarlist.readonly
+https://www.googleapis.com/auth/calendar.events.readonly</code></pre>
+  <div class="callout warn">
+    <strong>Scope changes require re-authentication.</strong> Users who tested
+    an earlier local variant should run <code>setup_auth.py</code> again so new
+    tokens reflect the consolidated scope set. This version requests no Google
+    Drive scope.
+  </div>
+
+  <h2 id="client">5. MCP Client Configuration</h2>
+  <p>The MCP client starts the Python server as a child process and communicates
+    with it over stdio. No standalone web server or open listening port is
+    required.</p>
+
+  <h3>macOS or Linux example</h3>
+  <pre><code>{
+  "mcpServers": {
+    "gmail-hardened": {
+      "command": "/absolute/path/to/gmail-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/gmail-mcp/server.py"]
+    }
+  }
+}</code></pre>
+
+  <h3>Windows example</h3>
+  <pre><code>{
+  "mcpServers": {
+    "gmail-hardened": {
+      "command": "C:\\absolute\\path\\to\\gmail-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\absolute\\path\\to\\gmail-mcp\\server.py"]
+    }
+  }
+}</code></pre>
+
+  <p>Common Claude Desktop configuration locations:</p>
+  <ul>
+    <li>macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+    <li>Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+  </ul>
+
+  <h2 id="security">6. Security Model</h2>
+  <h3>Confirmation-bound writes</h3>
+  <p>All tools that create or modify state use a two-step flow:
+    <code>gmail_send</code>, <code>gmail_create_draft</code>,
+    <code>gmail_modify_labels</code>, <code>gmail_trash</code>, and
+    <code>gmail_download_attachment</code>. The initial call returns a preview
+    and a ten-minute, one-time <code>confirmation_token</code>. Execution
+    requires identical arguments together with <code>confirm: true</code> and
+    that token.</p>
+
+  <h3>Untrusted external data</h3>
+  <p>Mailbox content and calendar content can contain prompt-injection text.
+    Tool responses containing external text include an untrusted-content
+    warning, instructing the MCP client to treat it as data and never as
+    authorization to send, delete, relabel, download, or disclose material.</p>
+
+  <h3>Attachment controls</h3>
+  <ul>
+    <li>Outbound attachments and downloaded attachment destinations are limited to the user's <code>Downloads</code>, <code>Documents</code>, or <code>Desktop</code> folders.</li>
+    <li>Paths are resolved before checking, preventing a symlink from escaping an allowed directory.</li>
+    <li>The configured credentials directory, configured client-secret files, and common private-key or secret filenames cannot be attached.</li>
+    <li>Downloaded bytes remain untrusted and are not automatically opened or executed.</li>
+  </ul>
+
+  <h3>Local credential protection</h3>
+  <p>OAuth client secrets, refresh tokens, and user configuration remain local
+    and are excluded from Git. Token writes request user-only filesystem
+    permissions where supported. On shared Windows computers, users should
+    also review folder ACLs on the project and <code>credentials/</code>
+    directory.</p>
+
+  <h3>Residual risk</h3>
+  <p>This MCP reduces unintended writes but cannot defend against theft of local
+    OAuth tokens, a compromised workstation, or a user authorizing a harmful
+    preview. Review the complete threat model in
+    <a href="../SECURITY.md"><code>SECURITY.md</code></a>.</p>
+
+  <h2 id="merge">7. Merge Decisions</h2>
+  <table>
+    <thead>
+      <tr><th>Source material</th><th>Carried forward</th><th>Changed or excluded</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>macOS-oriented hardened guide and implementation</td>
+        <td>Gmail send flow, Calendar access, multi-account configuration, setup pattern</td>
+        <td>Examples sanitized; confirmation controls strengthened</td>
+      </tr>
+      <tr>
+        <td>Windows implementation and session report</td>
+        <td>PowerShell setup and cross-platform operational notes</td>
+        <td>Google Drive experiments, sharing links, and rich-composition experiments excluded</td>
+      </tr>
+      <tr>
+        <td>Final consolidated version</td>
+        <td>One portable server, platform setup scripts, security documentation and CI</td>
+        <td>One-time mutation confirmations, least-privilege Calendar scopes and dependency audit added</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>Why no Google Drive?</strong> Uploading a file and granting access
+    is a separate disclosure boundary from reading and sending email. It should
+    be implemented in a dedicated MCP with its own OAuth scopes, consent
+    decisions, logging, tests, and security review.
+  </div>
+
+  <h2 id="verification">8. Verification and Publication</h2>
+  <p>The consolidated repository is designed to contain source, documentation,
+    setup scripts, and tests only. Local assembly inputs, credential material,
+    tokens, private configuration, virtual environments, generated archives,
+    and historic source reports are excluded from publication.</p>
+
+  <h3>Validation performed for the initial release</h3>
+  <ul>
+    <li>Smoke tests passed locally for the registered MCP tool surface.</li>
+    <li>Dependency audit reported no known vulnerabilities in pinned direct dependencies.</li>
+    <li>GitHub Actions validated the project on Windows, macOS, and Ubuntu.</li>
+    <li>The final source review confirmed <code>gmail_send</code> remains available and Google Drive functionality is absent.</li>
+  </ul>
+
+  <h3>Before publishing changes</h3>
+  <ol>
+    <li>Check that no <code>config.json</code>, <code>credentials/</code>, token, client-secret, local report, or archive file is staged.</li>
+    <li>Run <code>python -m unittest discover -s tests</code>.</li>
+    <li>Run a dependency vulnerability audit and review changes to OAuth scopes or write-tool behavior.</li>
+    <li>Re-authenticate test accounts after any scope change and perform a deliberate preview-confirm send test.</li>
+  </ol>
+
+  <h3>Related project documents</h3>
+  <ul>
+    <li><a href="../README.md"><code>README.md</code></a> - installation and project overview.</li>
+    <li><a href="../SECURITY.md"><code>SECURITY.md</code></a> - threat model and residual risks.</li>
+    <li><a href="COMPARISON.md"><code>docs/COMPARISON.md</code></a> - source comparison and inclusion decisions.</li>
+    <li><a href="../NOTICE.md"><code>NOTICE.md</code></a> - upstream attribution.</li>
+  </ul>
+</main>
+
+<footer>
+  Prepared for public distribution from consolidated local source variants.
+  This document intentionally contains no account identifiers, OAuth secrets,
+  token contents, mailbox data, or machine-specific working paths.
+</footer>
+</div>
+</body>
+</html>
