@@ -14,11 +14,12 @@ or view its source at
 ## Features
 
 - Multi-account Gmail search, reading, drafts, labels, and trash handling.
-- Read-only Google Calendar listing and event search.
+- Google Calendar listing and event search. The only Calendar write is
+  setting an event's colour.
 - macOS/Linux setup through `setup.sh` and Windows setup through `setup.ps1`.
 - Per-account OAuth client-secret paths, with a shared-secret fallback.
 - Preview plus a one-time confirmation token for sending email, changing
-  labels, and moving mail to Trash.
+  labels, moving mail to Trash, and changing an event's colour.
 - Attachment sends and downloads restricted to the user's `Downloads`,
   `Documents`, or `Desktop` directories.
 - Untrusted-content envelopes for email and calendar content, sanitised
@@ -92,6 +93,12 @@ On Windows:
 A browser opens once for each account. Re-run authentication after changing
 OAuth scopes or adding accounts.
 
+**Upgrading an existing install:** the `calendar.events` scope was added for
+`calendar_set_event_color`. Re-run `setup_auth.py` for every account after
+pulling this change. Until you do, token refresh asks Google for a scope the
+account never granted, Google refuses it, and every tool for that account
+(Gmail included) stops working once the current access token expires.
+
 ## MCP Client Configuration
 
 Use the JSON printed by the setup script. Typical macOS/Linux configuration:
@@ -132,7 +139,8 @@ calendar events are external input. Tools that return them include a warning
 telling the MCP client to treat those values as data rather than instructions.
 
 All write tools first return a preview: `gmail_send`, `gmail_create_draft`,
-`gmail_modify_labels`, `gmail_trash`, and `gmail_download_attachment`. They do
+`gmail_modify_labels`, `gmail_trash`, `gmail_download_attachment`, and
+`calendar_set_event_color`. They do
 nothing until called again with identical inputs, `confirm: true`, and the
 one-time `confirmation_token` returned by that preview. A confirmed draft
 creates visible Gmail content but does not send mail.
@@ -149,7 +157,13 @@ system supports them. On Windows, store the project inside your user profile
 and check directory ACLs if the computer is shared.
 
 The OAuth scope set is limited to `gmail.modify`,
-`calendar.calendarlist.readonly`, and `calendar.events.readonly`. This MCP
+`calendar.calendarlist.readonly`, `calendar.events.readonly`, and
+`calendar.events`. The last is a read/write scope: Google offers no narrower
+scope for changing an event's colour, so a stolen token could create, edit,
+or delete events on any calendar the account can reach. The server itself
+exposes only the colour change, which is a patch of `colorId` alone and does
+not notify attendees. `tests/test_smoke.py` pins the scope list and the
+Calendar tool set, so widening either fails the test suite. This MCP
 does not provide cloud-file upload or file-sharing operations; those belong
 in a separate service with separate consent and audit controls.
 
@@ -163,7 +177,12 @@ See [`SECURITY.md`](SECURITY.md) for the threat model and residual risks.
 | Gmail read | `gmail_get_profile`, `gmail_search`, `gmail_read_message`, `gmail_read_thread`, `gmail_list_drafts`, `gmail_list_labels` |
 | Gmail write | `gmail_send`, `gmail_create_draft`, `gmail_modify_labels`, `gmail_trash` |
 | Attachments | `gmail_download_attachment` |
-| Calendar read | `calendar_list_calendars`, `calendar_list_events`, `calendar_search`, `calendar_get_event` |
+| Calendar read | `calendar_list_calendars`, `calendar_list_events`, `calendar_search`, `calendar_get_event`, `calendar_list_event_colors` |
+| Calendar write | `calendar_set_event_color` |
+
+`gmail_list_drafts` returns drafts newest first and pages up to `max_results`
+(ceiling 1000). It waits out Gmail's per-minute rate limit, so listing a few
+hundred drafts can take several minutes.
 
 ## Publishing
 
